@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Enviromental stats{% endblock %}</h1>
+  
+{% endblock %}
+
+{% block content %}
+  {% for row in rows %}
+    <article class="post">
+
+      <p class="body">date {{ row[1] }} and solar value {{ row[2] }}</p>
+
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

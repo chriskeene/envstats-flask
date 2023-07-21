@@ -5,8 +5,8 @@ from flask import (
 from datetime import datetime, date, timedelta
 import time
 import click
-from flaskr.db import get_db2
-from flaskr.db import query_db
+from envstats.db import get_db2
+from envstats.db import query_db
 from datetime import datetime, date, timedelta
 import psycopg2
 
