@@ -25,16 +25,14 @@ def create_app(test_config=None):
         content = {"brand": "Ford",
             "model": "Mustang",}
         content['title'] = 'testing...'
-        content['hosttest'] = hosttest 
+        content['hosttest'] = hosttest
         return render_template('basic.html', content = content)
         #return 'this is a factory' + hosttest
-    
     from . import db
     db.init_app(app)
 
     from . import stats
     app.register_blueprint(stats.bp)
     stats.init_app(app)
-
 
     return app

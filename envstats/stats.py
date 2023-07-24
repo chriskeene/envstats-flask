@@ -13,7 +13,6 @@ import psycopg2
 # for matplotlib
 import base64
 from io import BytesIO
-
 # for Sheffield solar stats
 from pvlive_api import PVLive
 
@@ -25,8 +24,6 @@ def listdb():
     posts = query_db(query)
     return render_template('stats/index.html', rows=posts)
    
-
-
 def add_historic():
     pvl = PVLive()
     def daterange(start_date, end_date):
@@ -38,7 +35,6 @@ def add_historic():
     for single_date in daterange(start_date, end_date): 
         # check if we have stats already...
         checksql = 'SELECT * from solar where date = %s;'
-
         existingdata = query_db(checksql, (single_date,))
         # if we have this date in the database (and hence a non empty list) we don't need to fetch
         if not existingdata:
