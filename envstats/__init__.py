@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, render_template
 from dotenv import load_dotenv
+from dotenv import dotenv_values
+
 
 
 def create_app(test_config=None):
@@ -11,9 +13,13 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
+    app.config['CHEESE'] = 'edam'
 
     load_dotenv()  # take environment variables from .env.
-    hosttest=os.getenv("HOSTTEST")
+    myconfig = dotenv_values(".env")
+    hosttest=app.config['CHEESE']
+    hosttest=myconfig['HOSTTEST']
+    #hosttest=os.getenv("HOSTTEST")
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
