@@ -18,7 +18,8 @@ def create_app(test_config=None):
     load_dotenv()  # take environment variables from .env.
     myconfig = dotenv_values(".env")
     hosttest=app.config['CHEESE']
-    hosttest=myconfig['HOSTTEST']
+    hosttest+=os.getcwd()
+    hosttest+=myconfig['HOSTTEST']
     #hosttest=os.getenv("HOSTTEST")
 
     if test_config is None:
@@ -31,7 +32,7 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/hello')
     def hello():
-        title = 'this is a factory' + hosttest
+        title = 'this is a factory ' + hosttest
         return render_template('basic.html', title=title)
         #return 'this is a factory' + hosttest
     
