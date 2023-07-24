@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
+{% block title %}{{content.title}}{% endblock %}
 
 {% block header %}
-  <h1>{{ title }}</h1>
+  <h1>title {{content.title}}</h1>
+
 {% endblock %}
 
 {% block content %}
+
+<pre>
+  {{ content|pprint()  }}
+  </pre>
  
 {% endblock %}

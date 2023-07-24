@@ -8,8 +8,13 @@ import click
 from envstats.db import get_db2
 from envstats.db import query_db
 from datetime import datetime, date, timedelta
+# for postgres
 import psycopg2
+# for matplotlib
+import base64
+from io import BytesIO
 
+# for Sheffield solar stats
 from pvlive_api import PVLive
 
 bp = Blueprint('stats', __name__, url_prefix='/stats')

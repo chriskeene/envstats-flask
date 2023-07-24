@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 # connect to postrgres on a remote server
 # note must use .zshrc file to set env vars.
 def get_db2():
-    load_dotenv()  # take environment variables from .env.
 
     if 'db' not in g:
         if not os.getenv("POSTGRESHOST"):
