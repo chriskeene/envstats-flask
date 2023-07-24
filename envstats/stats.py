@@ -1,13 +1,11 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-
 from datetime import datetime, date, timedelta
 import time
 import click
 from envstats.db import get_db2
 from envstats.db import query_db
-from datetime import datetime, date, timedelta
 # for postgres
 import psycopg2
 # for matplotlib
@@ -23,7 +21,7 @@ def listdb():
     query = 'SELECT * from solar'
     posts = query_db(query)
     return render_template('stats/index.html', rows=posts)
-   
+
 def add_historic():
     pvl = PVLive()
     def daterange(start_date, end_date):
@@ -32,7 +30,7 @@ def add_historic():
 
     start_date = date(2021, 1, 1)
     end_date = date(2022, 6, 5)
-    for single_date in daterange(start_date, end_date): 
+    for single_date in daterange(start_date, end_date):
         # check if we have stats already...
         checksql = 'SELECT * from solar where date = %s;'
         existingdata = query_db(checksql, (single_date,))
@@ -58,13 +56,3 @@ def add_solar_history_command():
 
 def init_app(app):
     app.cli.add_command(add_solar_history_command)
-
-
-
-
-
-
-
-
-
-

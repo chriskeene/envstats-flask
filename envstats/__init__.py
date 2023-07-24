@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 
 
-def create_app(test_config=None):
+def create_app():
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
@@ -14,7 +14,6 @@ def create_app(test_config=None):
     app.config['CHEESE'] = 'edam'
 
     load_dotenv()  # take environment variables from .env.
-    myconfig = dotenv_values(".env")
     hosttest=app.config['CHEESE']
     hosttest+=os.getcwd()
     hosttest=os.getenv("HOSTTEST")
@@ -22,8 +21,7 @@ def create_app(test_config=None):
     # a simple page that says hello and some debug stuff.
     @app.route('/hello')
     def hello():
-        content = {"brand": "Ford",
-            "model": "Mustang",}
+        content = {"brand": "Ford",}
         content['title'] = 'testing...'
         content['hosttest'] = hosttest
         return render_template('basic.html', content = content)
