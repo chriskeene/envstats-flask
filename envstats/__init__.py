@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from dotenv import load_dotenv
 
 
@@ -25,7 +25,9 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/hello')
     def hello():
-        return 'this is a factory' + hosttest
+        title = 'this is a factory' + hosttest
+        return render_template('basic.html', title=title)
+        #return 'this is a factory' + hosttest
     
     from . import db
     db.init_app(app)
