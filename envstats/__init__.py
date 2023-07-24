@@ -13,6 +13,7 @@ def create_app(test_config=None):
     )
 
     load_dotenv()  # take environment variables from .env.
+    hosttest=os.getenv("HOSTTEST")
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -24,7 +25,7 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/hello')
     def hello():
-        return 'this is a factory'
+        return 'this is a factory' + hosttest
     
     from . import db
     db.init_app(app)
