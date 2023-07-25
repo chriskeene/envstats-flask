@@ -10,4 +10,10 @@
   <pre>{{ output|pprint() }}</pre>
 
   <img src='data:image/png;base64,{{output.imgdata}}'/>
+
+  {% for table in output.table1 %}
+            {{output.table1titles[loop.index]}}
+            {{ table|safe }}
+  {% endfor %}
+
 {% endblock %}

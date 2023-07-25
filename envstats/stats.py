@@ -8,6 +8,9 @@ from matplotlib.figure import Figure
 import base64
 # for Sheffield solar stats
 from pvlive_api import PVLive
+#
+import numpy as np
+import pandas as pd
 from envstats.db import query_db
 
 bp = Blueprint("stats", __name__, url_prefix="/stats")
@@ -43,6 +46,13 @@ def solarstats():
     fig.savefig(buf, format="png")
     # Embed the result in the html output.
     output["imgdata"] = base64.b64encode(buf.getbuffer()).decode("ascii")
+    #
+    column_names = ['year', 'solartotal']
+    tuples_list = dbdata
+    # Now we need to transform the list into a pandas DataFrame:
+    df = pd.DataFrame(tuples_list, columns=column_names)
+    output["table1"] = [df.to_html(classes='data')]
+    output["table1titles"] = df.columns.values
     return render_template("stats/solar.html", output=output)
 
 
