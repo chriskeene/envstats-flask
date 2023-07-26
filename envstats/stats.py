@@ -29,7 +29,8 @@ def solarstats():
         "title": "solar output",
     }
     query = """SELECT concat(date_part('year', date), '/', date_part('month', date)), 
-        sum(solartotal) from solar 
+        trunc(sum(solartotal))
+        from solar 
         group by date_part('year', date), date_part('month', date)
         order by date_part('year', date), date_part('month', date);"""
     dbdata = query_db(query)
@@ -41,6 +42,14 @@ def solarstats():
     fig = Figure()
     ax = fig.subplots()
     ax.plot(solar_dates, solar_list)
+    ax.set(title = "Plot title here", xlabel = "Month",
+       ylabel = "solar output")
+    #fig.setp(ax.get_xticklabels(), rotation = 45)
+    ax.ticklabel_format(axis='y', style='plain')
+    ax.grid(True, linestyle='-.')
+    ax.tick_params(labelsize='medium', width=3)
+    fig.autofmt_xdate()
+
     # Save it to a temporary buffer.
     buf = BytesIO()
     fig.savefig(buf, format="png")
