@@ -2,6 +2,7 @@ from io import BytesIO
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from datetime import datetime, date, timedelta
 import click
+import time
 
 # for matplotlib
 from matplotlib.figure import Figure
@@ -41,6 +42,7 @@ def solarstats():
         solar_dates.append(i[0])
     fig = Figure()
     ax = fig.subplots()
+    
     ax.plot(solar_dates, solar_list)
     ax.set(title = "Plot title here", xlabel = "Month",
        ylabel = "solar output")
@@ -50,13 +52,14 @@ def solarstats():
     ax.tick_params(labelsize='medium', width=3)
     fig.autofmt_xdate()
 
+
     # Save it to a temporary buffer.
     buf = BytesIO()
     fig.savefig(buf, format="png")
     # Embed the result in the html output.
     output["imgdata"] = base64.b64encode(buf.getbuffer()).decode("ascii")
     #
-    column_names = ['year', 'solartotal']
+    column_names = ['year', 'solar total']
     tuples_list = dbdata
     # Now we need to transform the list into a pandas DataFrame:
     df = pd.DataFrame(tuples_list, columns=column_names)
@@ -70,14 +73,20 @@ def solarstats():
 def add_historic():
     pvl = PVLive()
 
+
+
+
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2021, 1, 1)
-    end_date = date(2023, 5, 1)
+    start_date = date(2023, 7, 1)
+    end_date = date(2023, 8, 1)
+    end_date = date.today()  
+    start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
         # check if we have stats already...
+        # TODO this should only be one query not one for each date!
         checksql = "SELECT * from solar where date = %s;"
         existingdata = query_db(checksql, (single_date,))
         # if we have this date in the database (and hence a non empty list) we don't need to fetch
@@ -91,8 +100,8 @@ def add_historic():
             print("adding..." + tmpdatestring2)
             time.sleep(1)
         else:
-            print("already have:")
-            print(existingdata[0])
+            print("already have: ", existingdata[0] )
+            
 
 
 @click.command("add-solar-history")
