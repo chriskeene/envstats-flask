@@ -7,8 +7,8 @@
 {% block content %}
   
 
-  <pre>{{ output|pprint() }}</pre>
 
+<p>Solar panel output</p>
   <img src='data:image/png;base64,{{output.imgdata}}'/>
 
   {% for table in output.table1 %}
