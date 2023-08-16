@@ -9,10 +9,11 @@
 
 
 <p>Solar panel output</p>
-  <img src='data:image/png;base64,{{output.imgdata}}'/>
+
+  <img src="{{ url_for('static', filename='images/foo.png') }}">
 
   {% for table in output.table1 %}
-            {{output.table1titles[loop.index]}}
+        <p>    {{output.table1titles[loop.index]}} </p>
             {{ table|safe }}
   {% endfor %}
 
