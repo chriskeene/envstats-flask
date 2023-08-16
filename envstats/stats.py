@@ -5,8 +5,11 @@ import click
 import time
 
 # for matplotlib
+import matplotlib
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
 import base64
+matplotlib.use('agg')
 # for Sheffield solar stats
 from pvlive_api import PVLive
 #
@@ -35,34 +38,19 @@ def solarstats():
         group by date_part('year', date), date_part('month', date)
         order by date_part('year', date), date_part('month', date);"""
     dbdata = query_db(query)
-    solar_list = []
-    solar_dates = []
-    for i in dbdata:
-        solar_list.append(int(i[1]))
-        solar_dates.append(i[0])
-    fig = Figure()
-    ax = fig.subplots()
-    
-    ax.plot(solar_dates, solar_list)
-    ax.set(title = "Plot title here", xlabel = "Month",
-       ylabel = "solar output")
-    #fig.setp(ax.get_xticklabels(), rotation = 45)
-    ax.ticklabel_format(axis='y', style='plain')
-    ax.grid(True, linestyle='-.')
-    ax.tick_params(labelsize='medium', width=3)
-    fig.autofmt_xdate()
-
-
-    # Save it to a temporary buffer.
-    buf = BytesIO()
-    fig.savefig(buf, format="png")
-    # Embed the result in the html output.
-    output["imgdata"] = base64.b64encode(buf.getbuffer()).decode("ascii")
     #
-    column_names = ['year', 'solar total']
+    column_names = ['Month', 'Solar total']
     tuples_list = dbdata
     # Now we need to transform the list into a pandas DataFrame:
     df = pd.DataFrame(tuples_list, columns=column_names)
+    df['Solar total'] = df['Solar total'].astype(int)
+    ax = df.plot(kind='line', grid=1, fontsize=10)
+    plt.xlabel("Month",  size = 10)
+    plt.legend(fontsize="8", loc ="lower left")
+    plt.ylabel("solar energy output", size = 10)
+    plt.title("Solar electical output", size = 15)
+    plt.ticklabel_format(style='plain', axis='y')
+    plt.savefig('envstats/static/images/foo.png')
     output["table1"] = [df.to_html(classes='data')]
     output["table1titles"] = df.columns.values
     return render_template("stats/solar.html", output=output)
@@ -96,11 +84,9 @@ def add_historic():
             query_db(addsql, (tmpdatestring2, tmpdatestring, daysolartotal))
             print("adding..." + tmpdatestring2)
             time.sleep(1)
-        else:
-            print("already have: ", existingdata[0] )
- 
-            
-
+        #else:
+         #   print("already have: ", existingdata[0] )
+    # generate_solar_pmg()
 
 @click.command("add-solar-history")
 def add_solar_history_command():
