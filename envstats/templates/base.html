@@ -4,18 +4,20 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='simple.min.css') }}">
 </head>
 <body>
-<nav>
-  <h1>envstats</h1>
-
-</nav>
+<header>
+  <h1>Enviromental stats</h1>
+  {% block header %}{% endblock %}
+</header>
+<main>
 <section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
+
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
   {% block content %}{% endblock %}
 </section>
+</main>
+
 <pre>{{ output|pprint() }}</pre>
+<footer>Enviromental stats</footer>
 </body>

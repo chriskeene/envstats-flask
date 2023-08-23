@@ -26,12 +26,7 @@ def listdb():
     posts = query_db(query)
     return render_template("stats/index.html", rows=posts)
 
-
-@bp.route("/solar")
-def solarstats():
-    output = {
-        "title": "solar output",
-    }
+def get_solar_data():
     query = """SELECT concat(date_part('year', date), '/', date_part('month', date)), 
         trunc(sum(solartotal))
         from solar 
@@ -44,13 +39,26 @@ def solarstats():
     # Now we need to transform the list into a pandas DataFrame:
     df = pd.DataFrame(tuples_list, columns=column_names)
     df['Solar total'] = df['Solar total'].astype(int)
-    ax = df.plot(kind='line', grid=1, fontsize=10)
+    return df
+
+def create_solar_chart1(df):
+    ax = df.plot(kind='line', grid=1, fontsize=10, x="Month")
     plt.xlabel("Month",  size = 10)
     plt.legend(fontsize="8", loc ="lower left")
     plt.ylabel("solar energy output", size = 10)
     plt.title("Solar electical output", size = 15)
     plt.ticklabel_format(style='plain', axis='y')
     plt.savefig('envstats/static/images/foo.png')
+
+
+@bp.route("/solar")
+def solarstats():
+    output = {
+        "title": "solar output",
+    }
+    df = get_solar_data()
+    create_solar_chart1(df)
+    # print table 
     output["table1"] = [df.to_html(classes='data')]
     output["table1titles"] = df.columns.values
     return render_template("stats/solar.html", output=output)
@@ -87,6 +95,8 @@ def add_historic():
         #else:
          #   print("already have: ", existingdata[0] )
     # generate_solar_pmg()
+    df = get_solar_data()
+    create_solar_chart1(df)
 
 @click.command("add-solar-history")
 def add_solar_history_command():

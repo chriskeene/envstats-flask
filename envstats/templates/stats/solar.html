@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}{{output.title}}{% endblock %}</h1>
+  <h2>{% block title %}{{output.title}}{% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
-  
-
 
 <p>Solar panel output</p>
 
   <img src="{{ url_for('static', filename='images/foo.png') }}">
 
   {% for table in output.table1 %}
-        <p>    {{output.table1titles[loop.index]}} </p>
+        
             {{ table|safe }}
   {% endfor %}
 
