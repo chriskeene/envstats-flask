@@ -19,6 +19,10 @@ from envstats.db import query_db
 
 bp = Blueprint("stats", __name__, url_prefix="/stats")
 
+#create a df for each year
+def split_years(dt):
+    return [dt[dt['year'] == y] for y in dt['year'].unique()]
+
 
 @bp.route("/listdb")
 def listdb():
@@ -27,28 +31,47 @@ def listdb():
     return render_template("stats/index.html", rows=posts)
 
 def get_solar_data():
-    query = """SELECT concat(date_part('year', date), '/', date_part('month', date)), 
-        trunc(sum(solartotal))
+    query = """SELECT concat(date_part('year', date), '/', date_part('month', date)) as "Date", 
+        date_part('year', date) as "Year",
+        date_part('month', date) as "Month",
+        trunc(sum(solartotal) ) as "Solar"
         from solar 
         group by date_part('year', date), date_part('month', date)
         order by date_part('year', date), date_part('month', date);"""
     dbdata = query_db(query)
     #
-    column_names = ['Month', 'Solar total']
+    column_names = ['date', 'year', 'month', 'solartotal']
     tuples_list = dbdata
     # Now we need to transform the list into a pandas DataFrame:
     df = pd.DataFrame(tuples_list, columns=column_names)
-    df['Solar total'] = df['Solar total'].astype(int)
+    df['month'] = df['month'].astype(int)
+    df['year'] = df['year'].astype(int)
+    df['solartotal'] = df['solartotal'].astype(int)
     return df
 
 def create_solar_chart1(df):
-    ax = df.plot(kind='line', grid=1, fontsize=10, x="Month")
+    df = df[['date','solartotal']]
+    ax = df.plot(kind='line', grid=1, fontsize=10, x="date")
     plt.xlabel("Month",  size = 10)
     plt.legend(fontsize="8", loc ="lower left")
     plt.ylabel("solar energy output", size = 10)
     plt.title("Solar electical output", size = 15)
     plt.ticklabel_format(style='plain', axis='y')
     plt.savefig('envstats/static/images/foo.png')
+
+def create_solar_chart2(df):
+    df4 = split_years(df)
+    plt.style.use('ggplot') 
+    plt.xlabel('Month')
+    plt.ylabel('solar output')
+    for y in df4:
+        y.name = y['year'].iloc[[0]].to_string(index=False)
+        plt.plot(y['solartotal'].tolist(),label= y.name)
+    plt.legend(loc='best')
+    plt.title('Solar output per year')
+    plt.ticklabel_format(style='plain', axis='y')
+    plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11], ['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],rotation=20)
+    plt.savefig('envstats/static/images/solar2.png')
 
 
 @bp.route("/solar")
@@ -57,7 +80,8 @@ def solarstats():
         "title": "solar output",
     }
     df = get_solar_data()
-    create_solar_chart1(df)
+    #create_solar_chart1(df)
+    create_solar_chart2(df)
     # print table 
     output["table1"] = [df.to_html(classes='data')]
     output["table1titles"] = df.columns.values
@@ -65,7 +89,7 @@ def solarstats():
 
 
 # for running from command line. only retrieves solar data from api
-# for those days with no data.
+# for those days with no data. by default check the last 30 days
 def add_historic():
     pvl = PVLive()
 
@@ -97,6 +121,7 @@ def add_historic():
     # generate_solar_pmg()
     df = get_solar_data()
     create_solar_chart1(df)
+    create_solar_chart2(df)
 
 @click.command("add-solar-history")
 def add_solar_history_command():
