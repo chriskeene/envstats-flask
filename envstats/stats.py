@@ -81,7 +81,7 @@ def solarstats():
     }
     df = get_solar_data()
     #create_solar_chart1(df)
-    create_solar_chart2(df)
+    #create_solar_chart2(df)
     # print table 
     output["table1"] = [df.to_html(classes='data')]
     output["table1titles"] = df.columns.values
