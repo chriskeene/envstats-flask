@@ -58,6 +58,7 @@ def create_solar_chart1(df):
     plt.title("Solar electical output", size = 15)
     plt.ticklabel_format(style='plain', axis='y')
     plt.savefig('envstats/static/images/foo.png')
+    plt.close() 
 
 def create_solar_chart2(df):
     df4 = split_years(df)
@@ -72,6 +73,7 @@ def create_solar_chart2(df):
     plt.ticklabel_format(style='plain', axis='y')
     plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11], ['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],rotation=20)
     plt.savefig('envstats/static/images/solar2.png')
+    plt.close() 
 
 
 @bp.route("/solar")
