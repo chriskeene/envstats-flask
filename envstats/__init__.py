@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask, render_template
 from dotenv import load_dotenv
 
@@ -14,8 +13,6 @@ def create_app():
     app.config['CHEESE'] = 'edam'
 
     load_dotenv()  # take environment variables from .env.
-    hosttest=app.config['CHEESE']
-    hosttest+=os.getcwd()
     hosttest=os.getenv("HOSTTEST")
 
     # a simple page that says hello and some debug stuff.
@@ -25,12 +22,11 @@ def create_app():
         content['title'] = 'testing...'
         content['hosttest'] = hosttest
         return render_template('basic.html', content = content)
-        #return 'this is a factory' + hosttest
     from . import db
     db.init_app(app)
 
     from . import stats
-    app.register_blueprint(stats.bp)
+    app.register_blueprint(stats.stats)
     stats.init_app(app)
 
     return app

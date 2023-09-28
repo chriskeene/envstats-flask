@@ -3,28 +3,26 @@ from flask import Blueprint, flash, g, redirect, render_template, request, url_f
 from datetime import datetime, date, timedelta
 import click
 import time
-
 # for matplotlib
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 import base64
-matplotlib.use('agg')
 # for Sheffield solar stats
 from pvlive_api import PVLive
-#
 import numpy as np
 import pandas as pd
 from envstats.db import query_db
+matplotlib.use('agg')
 
-bp = Blueprint("stats", __name__, url_prefix="/stats")
+stats = Blueprint("stats", __name__, url_prefix="/stats")
 
 #create a df for each year
 def split_years(dt):
     return [dt[dt['year'] == y] for y in dt['year'].unique()]
 
 
-@bp.route("/listdb")
+@stats.route("/listdb")
 def listdb():
     query = "SELECT * from solar"
     posts = query_db(query)
@@ -57,7 +55,7 @@ def create_solar_chart1(df):
     plt.ylabel("solar energy output", size = 10)
     plt.title("Solar electical output", size = 15)
     plt.ticklabel_format(style='plain', axis='y')
-    plt.savefig('envstats/static/images/foo.png')
+    plt.savefig('envstats/static/images/solar1.png')
     plt.close() 
 
 def create_solar_chart2(df):
@@ -76,7 +74,7 @@ def create_solar_chart2(df):
     plt.close() 
 
 
-@bp.route("/solar")
+@stats.route("/solar")
 def solarstats():
     output = {
         "title": "solar output",
