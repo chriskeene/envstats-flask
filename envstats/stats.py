@@ -74,6 +74,30 @@ def create_solar_chart2(df):
     plt.savefig('envstats/static/images/solar2.png')
     plt.close() 
 
+#create a df for each year
+def split_years(dt):
+    return [dt[dt['year'] == y] for y in dt['year'].unique()]
+
+
+
+def create_solar_table1(df):
+    df4 = split_years(df)
+    df5 = pd.DataFrame(columns=['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
+    #df4 is a list of dataframes, each one being one years worth of data
+    for yeardf in df4:
+        # look at year value(1) in the first row
+        thisyear = yeardf.iat[0, 1]
+        #make a list of each month's solar output for this year
+        thistotlist = yeardf['solartotal'].tolist()
+        # the current year wont have 12 months worth of values
+        while len(thistotlist) < 12:
+            thistotlist.append(0)
+        print("thisyear ",thisyear)
+        print(thistotlist)
+        #add this year and its list to new df
+        df5.loc[thisyear] = thistotlist
+    return df5
+
 
 @stats.route("/solar")
 def solarstats():
@@ -84,8 +108,9 @@ def solarstats():
     #create_solar_chart1(df)
     #create_solar_chart2(df)
     # print table 
-    output["table1"] = [df.to_html(classes='data')]
-    output["table1titles"] = df.columns.values
+    df5 = create_solar_table1(df)
+    output["table1"] = [df5.to_html(classes='data')]
+    output["table1titles"] = df5.columns.values
     return render_template("stats/solar.html", output=output)
 
 
