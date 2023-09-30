@@ -1,6 +1,7 @@
 from io import BytesIO
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 from datetime import datetime, date, timedelta
+from decimal import Decimal
 import click
 import time
 # for matplotlib
@@ -123,12 +124,58 @@ def add_historic():
     create_solar_chart1(df)
     create_solar_chart2(df)
 
-@click.command("add-solar-history")
+# command line function to check historic values and TODO update the db
+def check_historic():
+    pvl = PVLive()
+    def daterange(start_date, end_date):
+        for n in range(int((end_date - start_date).days)):
+            yield start_date + timedelta(n)
+
+    start_date = date(2023, 8, 1)
+    end_date = date(2023, 9, 28)
+    #end_date = date.today()  
+    #start_date = (date.today()-timedelta(days=30))
+    for single_date in daterange(start_date, end_date):
+        # check if we have stats already...
+        # TODO this should only be one query not one for each date!
+        checksql = "SELECT * from solar where date = %s;"
+        existingdata = query_db(checksql, (single_date,))
+        existingsolartotal = existingdata[0][2]
+        # if we have this date in the database (and hence a non empty list) we can compare
+        if existingdata:
+            # collect stats from api
+            tmpdatestring2 = single_date.strftime("%Y%m%d")
+            daysolartotalfloat = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
+            tmpsolarstring = str(daysolartotalfloat)
+            daysolartotal = Decimal(tmpsolarstring)
+            if daysolartotal == existingsolartotal:
+                print("MATCH : " + tmpdatestring2 + " daysolartotal ")
+                print(daysolartotal)
+                print(existingsolartotal)
+            else:
+                print("INCORRECT! : " + tmpdatestring2 + " api "  + " db ")
+                print(daysolartotal)
+                print(existingsolartotal)
+                print(existingdata[0])
+            time.sleep(2)
+        else:
+            print("not in db: ", existingdata[0] )
+
+
+
+@click.command('add-solar-history')
 def add_solar_history_command():
     """Adding older solar data."""
     add_historic()
     click.echo("done")
 
+@click.command('check-solar-data')
+def check_solar_data_command():
+    """Adding older solar data."""
+    check_historic()
+    click.echo("done")    
+
 
 def init_app(app):
     app.cli.add_command(add_solar_history_command)
+    app.cli.add_command(check_solar_data_command)
