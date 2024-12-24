@@ -108,7 +108,7 @@ def create_solar_table1(df):
         df5.loc[thisyear] = thistotlist
     return df5
 
-
+@stats.route('/')
 @stats.route("/solar")
 def solarstats():
     output = {
@@ -188,14 +188,15 @@ def check_historic():
                 print(daysolartotal)
                 print(existingsolartotal)
             else:
-                print("INCORRECT! : " + tmpdatestring2 + " api " + str(daysolartotal) + " db " + str(existingsolartotal))
-                #print(daysolartotal)
-                #print(existingsolartotal)
+                print("INCORRECT! : " + tmpdatestring2 + " api " + str(daysolartotal) + " db " + str(existingsolartotal) + " diff:" + difference)
+
                 difference = abs(daysolartotal-existingsolartotal)
-                print(difference)
-                print(existingdata[0])
+                #print(existingdata[0])
+                #log the difference
                 addsql = "INSERT INTO solar_check_log (\"current_date\", date, orig_value, new_value, difference) VALUES(%s, %s, %s, %s, %s);"
                 query_db(addsql, (date.today(), single_date,existingsolartotal, daysolartotal, difference))
+                #now update the db
+                updatesql = "UPDATE solar SET solartotal = '%s' where id = XXX"
             time.sleep(1)
         else:
             print("not in db: ", existingdata[0] )

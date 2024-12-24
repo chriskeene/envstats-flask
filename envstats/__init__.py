@@ -17,7 +17,10 @@ def create_app():
     db.init_app(app)
 
     from . import stats
+    from . import home
     app.register_blueprint(stats.stats)
+    app.register_blueprint(home.home)
     stats.init_app(app)
+
 
     return app
