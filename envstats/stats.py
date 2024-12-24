@@ -13,6 +13,7 @@ import base64
 from pvlive_api import PVLive
 import numpy as np
 import pandas as pd
+import requests
 from envstats.db import query_db
 matplotlib.use('agg')
 
@@ -28,6 +29,13 @@ def listdb():
     query = "SELECT * from solar"
     posts = query_db(query)
     return render_template("stats/index.html", rows=posts)
+
+@stats.route("/test")
+def test():
+    url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1182933/20230907_Average_road_fuel_sales_deliveries_and_stock_levels.xlsx'
+    r = requests.get(url, allow_redirects=True)
+    open('avg_fuel_sales.xlsx', 'wb').write(r.content)
+    return "hello"
 
 def get_solar_data():
     query = """SELECT concat(date_part('year', date), '/', date_part('month', date)) as "Date", 
@@ -46,6 +54,8 @@ def get_solar_data():
     df['month'] = df['month'].astype(int)
     df['year'] = df['year'].astype(int)
     df['solartotal'] = df['solartotal'].astype(int)
+    # should hopefully add thousand separtors
+    df.head().style.format({"csolartotal": "{:,.0f}"})
     return df
 
 def create_solar_chart1(df):
@@ -118,7 +128,6 @@ def solarstats():
 # for those days with no data. by default check the last 30 days
 def add_historic():
     pvl = PVLive()
-
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
@@ -142,8 +151,6 @@ def add_historic():
             query_db(addsql, (tmpdatestring2, tmpdatestring, daysolartotal))
             print("adding..." + tmpdatestring2)
             time.sleep(1)
-        #else:
-         #   print("already have: ", existingdata[0] )
     # generate_solar_pmg()
     df = get_solar_data()
     create_solar_chart1(df)
@@ -157,7 +164,7 @@ def check_historic():
             yield start_date + timedelta(n)
 
     start_date = date(2023, 8, 1)
-    end_date = date(2023, 9, 28)
+    end_date = date(2023, 8, 5)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
@@ -173,16 +180,23 @@ def check_historic():
             daysolartotalfloat = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
             tmpsolarstring = str(daysolartotalfloat)
             daysolartotal = Decimal(tmpsolarstring)
+            # reduce to 2 decimal places
+            daysolartotal = round(daysolartotal,2)
+            existingsolartotal = round(existingsolartotal,2)
             if daysolartotal == existingsolartotal:
                 print("MATCH : " + tmpdatestring2 + " daysolartotal ")
                 print(daysolartotal)
                 print(existingsolartotal)
             else:
-                print("INCORRECT! : " + tmpdatestring2 + " api "  + " db ")
-                print(daysolartotal)
-                print(existingsolartotal)
+                print("INCORRECT! : " + tmpdatestring2 + " api " + str(daysolartotal) + " db " + str(existingsolartotal))
+                #print(daysolartotal)
+                #print(existingsolartotal)
+                difference = abs(daysolartotal-existingsolartotal)
+                print(difference)
                 print(existingdata[0])
-            time.sleep(2)
+                addsql = "INSERT INTO solar_check_log (\"current_date\", date, orig_value, new_value, difference) VALUES(%s, %s, %s, %s, %s);"
+                query_db(addsql, (date.today(), single_date,existingsolartotal, daysolartotal, difference))
+            time.sleep(1)
         else:
             print("not in db: ", existingdata[0] )
 

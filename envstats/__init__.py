@@ -10,18 +10,9 @@ def create_app():
     app.config.from_mapping(
         SECRET_KEY='dev',
     )
-    app.config['CHEESE'] = 'edam'
 
     load_dotenv()  # take environment variables from .env.
     hosttest=os.getenv("HOSTTEST")
-
-    # a simple page that says hello and some debug stuff.
-    @app.route('/hello')
-    def hello():
-        content = {"brand": "Ford",}
-        content['title'] = 'testing...'
-        content['hosttest'] = hosttest
-        return render_template('basic.html', content = content)
     from . import db
     db.init_app(app)
 
