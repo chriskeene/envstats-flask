@@ -6,15 +6,18 @@
 
 {% block content %}
 
-<p>Solar panel output</p>
+<p>Solar PV output in the UK since 2021. Units are GWh. Source of data: <a href="https://www.solar.sheffield.ac.uk/pvlive/">University of Sheffield Solar</a>. </p>
 
   <img src="{{ url_for('static', filename='images/solar1.png') }}">
 
   <img src="{{ url_for('static', filename='images/solar2.png') }}">
 
+
+  <p>Solar output per month</p>
   {% for table in output.table1 %}
         
             {{ table|safe }}
   {% endfor %}
 
+  
 {% endblock %}

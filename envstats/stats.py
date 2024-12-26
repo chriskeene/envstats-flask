@@ -54,8 +54,6 @@ def get_solar_data():
     df['month'] = df['month'].astype(int)
     df['year'] = df['year'].astype(int)
     df['solartotal'] = df['solartotal'].astype(int)
-    # should hopefully add thousand separtors
-    df.head().style.format({"csolartotal": "{:,.0f}"})
     return df
 
 def create_solar_chart1(df):
@@ -92,7 +90,7 @@ def split_years(dt):
 
 def create_solar_table1(df):
     df4 = split_years(df)
-    df5 = pd.DataFrame(columns=['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
+    df5 = pd.DataFrame(columns=['Total', 'Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
     #df4 is a list of dataframes, each one being one years worth of data
     for yeardf in df4:
         # look at year value(1) in the first row
@@ -104,6 +102,9 @@ def create_solar_table1(df):
             thistotlist.append(0)
         print("thisyear ",thisyear)
         print(thistotlist)
+        print(sum(thistotlist))
+        # add a total to the front on the list 
+        thistotlist.insert(0,sum(thistotlist))
         #add this year and its list to new df
         df5.loc[thisyear] = thistotlist
     return df5
@@ -112,15 +113,15 @@ def create_solar_table1(df):
 @stats.route("/solar")
 def solarstats():
     output = {
-        "title": "solar output",
+        "title": "UK PV Solar every output",
     }
     df = get_solar_data()
     #create_solar_chart1(df)
     #create_solar_chart2(df)
     # print table 
     df5 = create_solar_table1(df)
-    output["table1"] = [df5.to_html(classes='data')]
-    output["table1titles"] = df5.columns.values
+    output["table1"] = [df5.astype('float64',errors='ignore').to_html(float_format=lambda x: format(x,',.0f'),classes='data')]
+    # ia this needed: output["table1titles"] = df5.columns.values
     return render_template("stats/solar.html", output=output)
 
 
