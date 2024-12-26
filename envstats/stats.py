@@ -126,19 +126,25 @@ def solarstats():
 
 # for running from command line. only retrieves solar data from api
 # for those days with no data. by default check the last 30 days
-def add_historic():
+def add_historic(start_date = None):
     pvl = PVLive()
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2023, 7, 1)
-    end_date = date(2023, 8, 1)
-    end_date = date.today()  
-    start_date = (date.today()-timedelta(days=30))
+    # if we were passed a date just process for that date
+    if start_date:
+        end_date = (start_date+timedelta(days=1))  
+    else:   
+        #otherwise process for last 35 days
+        start_date = date(2023, 7, 1)
+        end_date = date(2023, 8, 1)
+        end_date = date.today()  
+        start_date = (date.today()-timedelta(days=35))
     for single_date in daterange(start_date, end_date):
         # check if we have stats already...
         # TODO this should only be one query not one for each date!
+        print ("checking " + str(single_date))
         checksql = "SELECT * from solar where date = %s;"
         existingdata = query_db(checksql, (single_date,))
         # if we have this date in the database (and hence a non empty list) we don't need to fetch
@@ -158,15 +164,15 @@ def add_historic():
     create_solar_chart1(df)
     create_solar_chart2(df)
 
-# command line function to check historic values and TODO update the db
+# command line function to check historic values 
 def check_historic():
     pvl = PVLive()
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2024, 1, 1)
-    end_date = date(2024, 12, 1)
+    start_date = date(2023, 12, 29)
+    end_date = date(2024, 1, 5)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
@@ -199,8 +205,8 @@ def check_historic():
                 query_db(updatesql, (daysolartotal,existingsolarid))
             time.sleep(1)
         else:
-            # todo run add histric on this date 
             print("not in db: ", single_date )
+            add_historic(single_date)
 
 
 
