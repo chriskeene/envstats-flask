@@ -147,6 +147,8 @@ def add_historic():
             tmpdatestring = single_date.strftime("%Y--%m--%d")
             tmpdatestring2 = single_date.strftime("%Y%m%d")
             daysolartotal = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
+            # reduce to 2 decimal places
+            daysolartotal = round(daysolartotal,2)
             addsql = "INSERT INTO solar (id, date, solartotal) VALUES(%s, %s, %s);"
             query_db(addsql, (tmpdatestring2, tmpdatestring, daysolartotal))
             print("adding..." + tmpdatestring2)
@@ -163,8 +165,8 @@ def check_historic():
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2023, 1, 1)
-    end_date = date(2023, 8, 5)
+    start_date = date(2024, 1, 1)
+    end_date = date(2024, 12, 1)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
@@ -172,10 +174,10 @@ def check_historic():
         # TODO this should only be one query not one for each date!
         checksql = "SELECT * from solar where date = %s;"
         existingdata = query_db(checksql, (single_date,))
-        existingsolartotal = existingdata[0][2]
-        existingsolarid = existingdata[0][0]
         # if we have this date in the database (and hence a non empty list) we can compare
         if existingdata:
+            existingsolartotal = existingdata[0][2]
+            existingsolarid = existingdata[0][0]
             # collect stats from api
             tmpdatestring2 = single_date.strftime("%Y%m%d")
             daysolartotalfloat = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
@@ -185,22 +187,20 @@ def check_historic():
             daysolartotal = round(daysolartotal,2)
             existingsolartotal = round(existingsolartotal,2)
             if daysolartotal == existingsolartotal:
-                print("MATCH : " + tmpdatestring2 + " daysolartotal ")
-                print(daysolartotal)
-                print(existingsolartotal)
+                print("MATCH : " + tmpdatestring2 + " api " + str(daysolartotal) + " db " + str(existingsolartotal))
             else:
                 difference = abs(daysolartotal-existingsolartotal)
                 print("INCORRECT! : " + tmpdatestring2 + " api " + str(daysolartotal) + " db " + str(existingsolartotal) + " diff:" + str(difference))
-                #print(existingdata[0])
                 #log the difference
                 addsql = "INSERT INTO solar_check_log (\"current_date\", date, orig_value, new_value, difference) VALUES(%s, %s, %s, %s, %s);"
                 query_db(addsql, (date.today(), single_date,existingsolartotal, daysolartotal, difference))
                 #now update the db
                 updatesql = "UPDATE solar SET solartotal = '%s' where id = %s;"
                 query_db(updatesql, (daysolartotal,existingsolarid))
-            time.sleep(2)
+            time.sleep(1)
         else:
-            print("not in db: ", existingdata[0] )
+            # todo run add histric on this date 
+            print("not in db: ", single_date )
 
 
 
