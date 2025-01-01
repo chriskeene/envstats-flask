@@ -10,6 +10,6 @@ def home2():
 
 @home.route('/')
 def home1():
-    return "<p>Hello, add /stats/ to the url</p>"
+    return "<p>Hello, add /stats/ to the url, or just go <a href='stats/'>here</a>.</p>"
     #return render_template("home.html")
 

@@ -15,7 +15,37 @@
   <img src="{{ url_for('static', filename='images/solar2.png') }}">
 </div>
 
- 
+  <div>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    
+    const ctx = document.getElementById('myChart');
+    {% autoescape false %}
+   const solardata1 =  {{output.table1json}};
+    {% endautoescape %}
+
+    const solardata2 = {
+      labels: ['Total', 'Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets: [{
+        label: '2021',
+        data: { Jan: 10, Feb: 20 }
+      }, {
+        label: '2023',
+        data: { Jan: 20, Feb: 40 }
+      }
+      ]
+    };
+
+
+
+  new Chart(ctx, {
+    type: 'line',
+    data: solardata2
+  }
+);
+  </script>
   <p>Solar output per month</p>
   {% for table in output.table1 %}
         

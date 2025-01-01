@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 import click
@@ -11,9 +11,9 @@ from matplotlib import pyplot as plt
 import base64
 # for Sheffield solar stats
 from pvlive_api import PVLive
-import numpy as np
+#import numpy as np
 import pandas as pd
-import requests
+#import requests
 from envstats.db import query_db
 matplotlib.use('agg')
 
@@ -30,14 +30,9 @@ def listdb():
     posts = query_db(query)
     return render_template("stats/index.html", rows=posts)
 
-@stats.route("/test")
-def test():
-    url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1182933/20230907_Average_road_fuel_sales_deliveries_and_stock_levels.xlsx'
-    r = requests.get(url, allow_redirects=True)
-    open('avg_fuel_sales.xlsx', 'wb').write(r.content)
-    return "hello"
 
 def get_solar_data():
+    """Get solar data from our db and add to a dataframe df"""
     query = """SELECT concat(date_part('year', date), '/', date_part('month', date)) as "Date", 
         date_part('year', date) as "Year",
         date_part('month', date) as "Month",
@@ -62,7 +57,7 @@ def create_solar_chart1(df):
     plt.xlabel("Month",  size = 10)
     plt.legend(fontsize="8", loc ="lower left")
     plt.ylabel("solar energy output", size = 10)
-    plt.title("Solar electical output", size = 15)
+    plt.title("UK Solar output since 2021", size = 15)
     plt.ticklabel_format(style='plain', axis='y')
     plt.savefig('envstats/static/images/solar1.png')
     plt.close() 
@@ -74,7 +69,7 @@ def create_solar_chart2(df):
     plt.ylabel('solar output')
     for y in df4:
         y.name = y['year'].iloc[[0]].to_string(index=False)
-        plt.plot(y['solartotal'].tolist(),label= y.name)
+        plt.plot(y['Solartotal'].tolist(),label= y.name)
     plt.legend(loc='best')
     plt.title('Solar output per year')
     plt.ticklabel_format(style='plain', axis='y')
@@ -100,9 +95,6 @@ def create_solar_table1(df):
         # the current year wont have 12 months worth of values
         while len(thistotlist) < 12:
             thistotlist.append(0)
-        print("thisyear ",thisyear)
-        print(thistotlist)
-        print(sum(thistotlist))
         # add a total to the front on the list 
         thistotlist.insert(0,sum(thistotlist))
         #add this year and its list to new df
@@ -120,8 +112,12 @@ def solarstats():
     #create_solar_chart2(df)
     # print table 
     df5 = create_solar_table1(df)
-    output["table1"] = [df5.astype('float64',errors='ignore').to_html(float_format=lambda x: format(x,',.0f'),classes='data')]
-    # ia this needed: output["table1titles"] = df5.columns.values
+    # the following takes df5 and converts it to html, most of the code is for converting to floats so that we can add thousand seperators
+    output["table1"] = [df5.astype('float64',errors='ignore').to_html(float_format=lambda x: format(x,',.0f'),classes='table table-hover data')]
+    output["table1json"] = df5.to_json(orient='records')
+    # Convert the DataFrame to a dictionary for Chart.js
+    data_dict = df5.to_dict(orient='list')
+    output["tjson2"] = jsonify(data_dict)
     return render_template("stats/solar.html", output=output)
 
 
