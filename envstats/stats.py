@@ -69,7 +69,7 @@ def create_solar_chart2(df):
     plt.ylabel('solar output')
     for y in df4:
         y.name = y['year'].iloc[[0]].to_string(index=False)
-        plt.plot(y['Solartotal'].tolist(),label= y.name)
+        plt.plot(y['solartotal'].tolist(),label= y.name)
     plt.legend(loc='best')
     plt.title('Solar output per year')
     plt.ticklabel_format(style='plain', axis='y')
