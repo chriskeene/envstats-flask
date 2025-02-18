@@ -16,11 +16,12 @@
 </div>
 
  
-  <p>Solar output per month</p>
+  <h3>Solar output per month</h3>
   {% for table in output.table1 %}
         
             {{ table|safe }}
   {% endfor %}
 
-  
+  <p>Charts updated: {{output.chartmoddate}} </p> 
 {% endblock %}
+

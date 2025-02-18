@@ -1,4 +1,6 @@
 from io import BytesIO
+import os 
+import time
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 from datetime import datetime, date, timedelta
 from decimal import Decimal
@@ -108,8 +110,6 @@ def solarstats():
         "title": "UK PV Solar every output",
     }
     df = get_solar_data()
-    #create_solar_chart1(df)
-    #create_solar_chart2(df)
     # print table 
     df5 = create_solar_table1(df)
     # the following takes df5 and converts it to html, most of the code is for converting to floats so that we can add thousand seperators
@@ -118,6 +118,10 @@ def solarstats():
     # Convert the DataFrame to a dictionary for Chart.js
     data_dict = df5.to_dict(orient='list')
     output["tjson2"] = jsonify(data_dict)
+    # pass date charts were updated 
+    solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
+    printsolar2date = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
+    output["chartmoddate"] = printsolar2date
     return render_template("stats/solar.html", output=output)
 
 
