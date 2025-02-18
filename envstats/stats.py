@@ -119,8 +119,11 @@ def solarstats():
     data_dict = df5.to_dict(orient='list')
     output["tjson2"] = jsonify(data_dict)
     # pass date charts were updated 
-    solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
-    printsolar2date = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
+    try:
+      solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
+      printsolar2date = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
+    except:
+        printsolar2date = "some point in the past"
     output["chartmoddate"] = printsolar2date
     return render_template("stats/solar.html", output=output)
 

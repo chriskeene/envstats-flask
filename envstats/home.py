@@ -8,6 +8,7 @@ home = Blueprint("home", __name__, url_prefix="/")
 
 @home.route("/home2")
 def home2():
+    cwd = os.getcwd() 
     try:
         #return render_template("home.html")
         solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
@@ -15,7 +16,7 @@ def home2():
         tmp = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
     except:
         tmp = "unsure."
-    return "<p>Hello, add /stats/ to the url " + tmp
+    return "<p>Hello, add /stats/ to the url " + tmp + cwd
 
 @home.route('/')
 def home1():
