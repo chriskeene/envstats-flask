@@ -11,7 +11,7 @@ def home2():
     cwd = os.getcwd() 
     try:
         #return render_template("home.html")
-        solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
+        solar2date = (os.path.getmtime("/opt/envstats/envstats/static/images/solar2.png"))    
         realsolardate2 = str(time.gmtime(solar2date))
         tmp = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
     except:
