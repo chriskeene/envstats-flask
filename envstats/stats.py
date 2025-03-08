@@ -175,8 +175,8 @@ def check_historic():
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2023, 12, 29)
-    end_date = date(2024, 1, 5)
+    start_date = date(2025, 1, 1)
+    end_date = date(2025, 2, 1)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
