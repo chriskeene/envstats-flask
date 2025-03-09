@@ -1,18 +1,23 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Enviromental stats{% endblock %}</h1>
+<h2>{% block title %}{{output.title}}{% endblock %}</h2>
   
 {% endblock %}
 
 {% block content %}
-  {% for row in rows %}
+<p>Last date : {{output.latest[0][0]}}</p>
+<ul>
+  {% for row in output.posts %}
     
-      <p class="body">date {{ row[1] }} and solar value {{ row[2] }}</p>
+      <li>date {{ row[1] }} and solar value {{ row[2] }}</li>
 
     {% if not loop.last %}
-      x
+      
     {% endif %}
+  
   {% endfor %}
+</ul>
+
  <!-- <pre>{{ rows|pprint() }}</pre> -->
 {% endblock %}

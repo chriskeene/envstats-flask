@@ -22,6 +22,6 @@
             {{ table|safe }}
   {% endfor %}
 
-  <p>Charts updated: {{output.chartmoddate}} </p> 
+  <p>Charts updated: {{output.latest[0][0]}} </p> 
 {% endblock %}
 

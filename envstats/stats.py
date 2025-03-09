@@ -28,9 +28,14 @@ def split_years(dt):
 
 @stats.route("/listdb")
 def listdb():
-    query = "SELECT * from solar"
-    posts = query_db(query)
-    return render_template("stats/index.html", rows=posts)
+    output = {
+        "title": "LIST",
+    }
+    query = "SELECT * from solar ORDER BY date"
+    output["posts"] = query_db(query)
+    latest_query = "SELECT date FROM public.solar ORDER BY date DESC limit 1"
+    output["latest"] = query_db(latest_query)
+    return render_template("stats/index.html", output=output)
 
 
 def get_solar_data():
@@ -125,6 +130,9 @@ def solarstats():
     except:
         printsolar2date = "some point in the past"
     output["chartmoddate"] = printsolar2date
+    # the most recent date collected
+    latest_query = "SELECT date FROM public.solar ORDER BY date DESC limit 1"
+    output["latest"] = query_db(latest_query)
     return render_template("stats/solar.html", output=output)
 
 
@@ -176,7 +184,7 @@ def check_historic():
             yield start_date + timedelta(n)
 
     start_date = date(2025, 1, 1)
-    end_date = date(2025, 2, 1)
+    end_date = date(2025, 3, 1)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
@@ -192,6 +200,7 @@ def check_historic():
             tmpdatestring2 = single_date.strftime("%Y%m%d")
             daysolartotalfloat = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
             tmpsolarstring = str(daysolartotalfloat)
+            print(tmpsolarstring)
             daysolartotal = Decimal(tmpsolarstring)
             # reduce to 2 decimal places
             daysolartotal = round(daysolartotal,2)
