@@ -123,13 +123,6 @@ def solarstats():
     # Convert the DataFrame to a dictionary for Chart.js
     data_dict = df5.to_dict(orient='list')
     output["tjson2"] = jsonify(data_dict)
-    # pass date charts were updated 
-    try:
-      solar2date = (os.path.getmtime("envstats/static/images/solar2.png"))    
-      printsolar2date = time.strftime("%a, %d %b %Y %H:%M",time.gmtime(solar2date))
-    except:
-        printsolar2date = "some point in the past"
-    output["chartmoddate"] = printsolar2date
     # the most recent date collected
     latest_query = "SELECT date FROM public.solar ORDER BY date DESC limit 1"
     output["latest"] = query_db(latest_query)
@@ -152,7 +145,7 @@ def add_historic(start_date = None):
         start_date = date(2023, 7, 1)
         end_date = date(2023, 8, 1)
         end_date = date.today()  
-        start_date = (date.today()-timedelta(days=35))
+        start_date = (date.today()-timedelta(days=20))
     for single_date in daterange(start_date, end_date):
         # check if we have stats already...
         # TODO this should only be one query not one for each date!
@@ -183,8 +176,8 @@ def check_historic():
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2025, 1, 1)
-    end_date = date(2025, 3, 1)
+    start_date = date(2024, 1, 1)
+    end_date = date(2024, 3, 2)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):
@@ -199,6 +192,7 @@ def check_historic():
             # collect stats from api
             tmpdatestring2 = single_date.strftime("%Y%m%d")
             daysolartotalfloat = pvl.day_energy(single_date, entity_type="pes", entity_id=0)
+            print(daysolartotalfloat)
             tmpsolarstring = str(daysolartotalfloat)
             print(tmpsolarstring)
             daysolartotal = Decimal(tmpsolarstring)
