@@ -61,6 +61,7 @@ def get_solar_data():
 def create_solar_chart1(df):
     df = df[['date','solartotal']]
     ax = df.plot(kind='line', grid=1, fontsize=10, x="date")
+    plt.style.use('ggplot') 
     plt.xlabel("Month",  size = 10)
     plt.legend(fontsize="8", loc ="lower left")
     plt.ylabel("solar energy output", size = 10)
@@ -72,7 +73,7 @@ def create_solar_chart1(df):
 def create_solar_chart2(df):
     df4 = split_years(df)
     plt.style.use('ggplot') 
-    plt.xlabel('Month')
+    plt.xlabel('Month', size = 10)
     plt.ylabel('solar output')
     for y in df4:
         y.name = y['year'].iloc[[0]].to_string(index=False)
@@ -118,7 +119,7 @@ def solarstats():
     # print table 
     df5 = create_solar_table1(df)
     # the following takes df5 and converts it to html, most of the code is for converting to floats so that we can add thousand seperators
-    output["table1"] = [df5.astype('float64',errors='ignore').to_html(float_format=lambda x: format(x,',.0f'),classes='table table-hover data')]
+    output["table1"] = [df5.astype('float64',errors='ignore').to_html(float_format=lambda x: format(x,',.0f'),classes='table table-sm table-hover data')]
     output["table1json"] = df5.to_json(orient='records')
     # Convert the DataFrame to a dictionary for Chart.js
     data_dict = df5.to_dict(orient='list')
@@ -171,7 +172,7 @@ def add_historic(start_date = None):
 
 # command line function to check historic values 
 def check_historic():
-    pvl = PVLive()
+    pvl = PVLive(domain_url="api.pvlive.uk")
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)

@@ -9,18 +9,22 @@
 
 <p>Solar PV output in the UK since 2021. Units are GWh. Source of data: <a href="https://www.solar.sheffield.ac.uk/pvlive/">University of Sheffield Solar</a>. </p>
 
-<div>
-  <img alt="chart showning solar generation overtime in the UK" src="{{ url_for('static', filename='images/solar1.png') }}">
-
-  <img alt="chart showing solar generation per year, each year has one value per month" src="{{ url_for('static', filename='images/solar2.png') }}">
+<div class="row">
+  <div class="col">
+    <img class="img-fluid" alt="chart showning solar generation overtime in the UK" src="{{ url_for('static', filename='images/solar1.png') }}">
+  </div>
+  <div class="col">
+    <img class="img-fluid" alt="chart showing solar generation per year, each year has one value per month" src="{{ url_for('static', filename='images/solar2.png') }}">
+  </div>
 </div>
 
- 
+ <div class="row">
   <h3>Solar output per month</h3>
   {% for table in output.table1 %}
         
             {{ table|safe }}
   {% endfor %}
+  </div>
 
   <p>Charts updated: {{output.latest[0][0]}}. Code <a href="https://github.com/chriskeene/envstats-flask">available on Github</a>. </p> 
 
