@@ -132,7 +132,7 @@ def solarstats():
 # for running from command line. only retrieves solar data from api
 # for those days with no data. by default check the last 30 days
 def add_historic(start_date = None):
-    pvl = PVLive()
+    pvl = PVLive(domain_url="api.pvlive.uk")
     def daterange(start_date, end_date):
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
@@ -176,8 +176,8 @@ def check_historic():
         for n in range(int((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
-    start_date = date(2024, 1, 1)
-    end_date = date(2024, 3, 2)
+    start_date = date(2024, 3, 1)
+    end_date = date(2024, 3, 17)
     #end_date = date.today()  
     #start_date = (date.today()-timedelta(days=30))
     for single_date in daterange(start_date, end_date):

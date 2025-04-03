@@ -9,9 +9,7 @@
 <p>Last date : {{output.latest[0][0]}}</p>
 <ul>
   {% for row in output.posts %}
-    
       <li>date {{ row[1] }} and solar value {{ row[2] }}</li>
-
     {% if not loop.last %}
       
     {% endif %}
